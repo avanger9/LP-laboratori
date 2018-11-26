@@ -1,0 +1,8 @@
+ +
+  \__+
+  |   \__+
+  |   |   \__intconst(3)
+  |   |   \__intconst(4)
+  |   \__intconst(5)
+  \__intconst(6)
+12
