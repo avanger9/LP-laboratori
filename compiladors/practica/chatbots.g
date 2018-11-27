@@ -11,13 +11,14 @@ using namespace std;
 typedef struct {
   string kind;
   string text;
+  int type;
 } Attrib;
 
 // function to fill token information (predeclaration)
 void zzcr_attr(Attrib *attr, int type, char *text);
 
 // fields for AST nodes
-#define AST_FIELDS string kind; string text;
+#define AST_FIELDS string kind; string text; int type;
 #include "ast.h"
 
 // macro to create a new AST node (and function predeclaration)
@@ -30,28 +31,10 @@ AST* createASTnode(Attrib* attr, int ttype, char *textt);
 #include <cmath>
 // function to fill token information
 void zzcr_attr(Attrib *attr, int type, char *text) {
-    /*
+    
     attr->kind = text;
     attr->text = "";
     attr->type = type;
-    */
-    /* Tal com m'ha comentat el José Miguel, per aquesta pràctica no calia fer-ho
-    així, i mes que provoca un petit error a l'hora de crear l'arbre, pero al fer
-    tot el codi partint d'aquesta configuracio, m'ha dit que no calia modificar-ho */
-    
-    if (type == ID) {
-        attr->kind = "id";
-        attr->text = text;
-    }
-    
-    else if (type == NUM) {
-        attr->kind = "num";
-        attr->text = text;
-    }
-    else {
-        attr->kind = text;
-        attr->text = "";
-    }
     
 }
 
@@ -60,6 +43,7 @@ AST* createASTnode(Attrib* attr, int type, char* text) {
     AST* as   = new AST;
     as->kind  = attr->kind; 
     as->text  = attr->text;
+    as->type  = attr->type;
     as->right = NULL; 
     as->down  = NULL;
     return as;
@@ -87,15 +71,10 @@ AST* child(AST *a,int n) {
 void ASTPrintIndent(AST *a,string s)
 {
     if (a==NULL) return;
-    /*
+    
     cout<<a->kind;
     if (a->text!="") cout<<"("<<a->text<<")";
     cout<<endl;
-    */
-    
-    if (a->text != "") cout << a->text;
-    else cout << a->kind;
-    cout << endl;
     
     AST *i = a->down;
     while (i!=NULL && i->right!=NULL) {
@@ -137,20 +116,20 @@ void executeAnswer(AST *a) {
     if (a == NULL) return;
     
     if (answ != "") answ += " ";
-    answ += a->text;
+    answ += a->kind;
 
     executeAnswer(a->right);
 }
 
 void executeEE(AST *a, string idn) {
     if (a != NULL) {
-        if (a->kind == "num") {
+        if (a->type == NUM) {
             executeAnswer(child(child(a,0),0));
             aa[idn].push_back(answ);
             answ = "";
         }
         else {
-            ques += a->text + " ";
+            ques += a->kind + " ";
             if (a->right == NULL) {
                 ques += "?";
                 qq[idn] = ques;
@@ -164,16 +143,16 @@ void executeEE(AST *a, string idn) {
 void executeQA(AST *a) {
     if (a == NULL) return;
     if (child(a,0)->kind == "list") 
-        executeEE(child(child(a,0),0), a->text); 
+        executeEE(child(child(a,0),0), a->kind); 
     executeQA(a->right);
 }
 
 void executeConv2(AST *a) { 
     if (a != NULL) {
-        cout << valor << " > " << nom_persona << ", " << qq[a->text] << endl;
-        int n = aa[a->right->text].size();
+        cout << valor << " > " << nom_persona << ", " << qq[a->kind] << endl;
+        int n = aa[a->right->kind].size();
         for (int i=0; i<n; ++i) {
-            cout << i+1 << ": " << aa[a->right->text][i] << endl;
+            cout << i+1 << ": " << aa[a->right->kind][i] << endl;
         }
         cout << nom_persona << " > ";
         int a;
@@ -183,7 +162,7 @@ void executeConv2(AST *a) {
 
 void executeConversation(AST *a, string cc) {
     if (a == NULL) return;
-    if (a->text == cc)
+    if (a->kind == cc)
         executeConv2(child(child(a,0),0));
     executeConversation(a->right, cc);
 }
@@ -202,26 +181,26 @@ void executeBoolean(AST *a) {
         for (int i=0; child(a,i) != NULL; ++i) {
             ++quantsOr;
         }
-        activaConversa(child(a,rand()%quantsOr)->text);
+        activaConversa(child(a,rand()%quantsOr)->kind);
     }
     else {
-        activaConversa(a->text);
+        activaConversa(a->kind);
     }
     executeBoolean(a->right);
 }
 
 void executeList(AST *a) {
     if (a == NULL) return;
-    string t = a->text;
+    string t = a->kind;
     executeBoolean(child(a,0));
 }
 
 void executeInteraccion(AST *a) {
     if (a == NULL) return;
     for (int i=0; child(a,i) != NULL; ++i) {
-        string nom_text = child(a,i)->kind;
-                  valor = child(a,i)->text;
-        if (nom_text == "num") {
+        int nom_text = child(a,i)->type;
+                  valor = child(a,i)->kind;
+        if (nom_text == NUM) {
             int seed = atoi(valor.c_str());
             srand(seed);
         }
