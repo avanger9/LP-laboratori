@@ -1,0 +1,3 @@
+fent make compila i executa el chatbot sense poder passar-li el nom i contestacions
+
+Al fer make executed arriba fins el ./chatbot se li ha de passar l'entrada manualment i aquí si permet tractarel chatbot
