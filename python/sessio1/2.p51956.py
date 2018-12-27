@@ -59,18 +59,26 @@ def oddsNevens(L):
 			Levens.append(i)
 	return Lodds,Levens
 
+import math
+
+def isPrime(x):
+	if x<=1:
+		return False
+	if x<=3:
+		return True
+	if x%2==0:
+		return False
+	for i in range(3, int(math.sqrt(x))+1, 2):
+		if x%i==0:
+			return False
+	return True
+
 def primeDivisors(n):
-	l = []
-	i = 2
-	while i*i < n:
-		if n%i:
-			i += 1
-		else:
-			l.append(i)
-			n //= i
-	if n>1:
-		l.append(n)
-	return l
+	divisors = [ d for d in range(2,n//2+1) if n%d==0 ]
+	prime_divisors = [ d for d in divisors if isPrime(d) ]
+	if isPrime(n):
+		prime_divisors.append(n)
+	return prime_divisors
 
 #print(primeDivisors(255))
 #print(remove([1,4,5,3,4,5,1,2,7,4,2], [2,4]))
