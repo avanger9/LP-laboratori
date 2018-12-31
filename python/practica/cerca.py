@@ -18,7 +18,7 @@ class Acte:
         self.lloc = acte.find('lloc_simple/nom').text
         self.barri = acte.findtext('lloc_simple/adreca_simple/barri')
         self.data = acte.find('data/data_proper_acte').text
-        self.horaFi = acte.find('data/hora_fi').text
+        #self.horaFi = acte.find('data/hora_fi').text
         def get_float(dir, attr):
             try:
                 return float(acte.find(dir).attrib[attr])
@@ -36,7 +36,6 @@ class Acte:
         self.codi_postal = acte.findtext('lloc_simple/adreca_simple/codi_postal')
 
     def evalua_expr(self, expr):
-        "evaluacio de l'entrada"
         if isinstance(expr, str):
             res = lambda txt: re.search(expr, txt, re.IGNORECASE)
             return res(self.nom) or res(self.barri) or res(self.lloc)
@@ -73,7 +72,7 @@ class Acte:
     def add_bicing_bikes(self, distance, bicing):
         dist = self.get_distance(bicing)
         if dist <= distance:
-            self.bicing_bks.append([dist,bicing])
+            self.ddstance.append([dist,bicing])
 
 
 class Bicing:
@@ -103,6 +102,56 @@ def tracta_xml(url):
     sock.close()
     root = ET.fromstring(xmlSource)
     return root
+
+def html_bicing(bicing, bll):
+    a = '<div style=\'margin-top:16px\'>\n'
+    for b in bicing:
+        if bll == 0: c = b.slots
+        else: c = b.bikes
+        a += '<p><b>' + b.idd + ', ' + b.street + ', ' \
+        + b.streetNumber + ', ' + c + '</p>\n'
+    a += "</div>"
+    return a
+
+def html_acte2(acte):
+    a = '<h2>' + acte.nom + '</h2>\n'
+    a += '<p><em>' + acte.lloc + ', ' + acte.carrer_as + ', ' \
+    + acte.numero + ', ' + acte.districte + ', ' + acte.codi_postal + ', ' \
+    + acte.munici + ', ' + acte.barri + '</p>\n'
+    a += "<p style=\"font-size:12px;color:#444\"><b>" + acte.data + "</b></p>\n"
+    a += html_bicing(acte.bicing_slots, 0)
+    a += html_bicing(acte.bicing_bks, 1)
+    a += '</div>'
+    return a
+
+def html_acte(actes):
+    a = '<div>'
+    for acte in actes:
+        a += html_acte2(acte)
+    a += '</div>'
+    return a
+
+def funcio_html(actes):
+    file = open('table.html', 'w')
+    file.write("""<!DOCTYPE html>
+<html>
+    <head>
+        <title>Practica de LP - Python</title>
+        <meta charset="UTF-8" />
+        <style>
+            html { font-family: "HelveticaNeue-Light"; font-weight: 300; }
+            div { margin-bottom:64px; margin-left:64px; margin-right:64px }
+            h1 { font-size:32px; font-weight: bold; color:#444; }
+            h2 { font-size:20px; color:#000; }
+            p { font-size:16px; margin-top:8px; margin-bottom:8px }
+            a { text-decoration: none; }
+        </style>
+    </head>
+    <body>""")
+    file.write(html_acte(actes))
+    file.write("""
+    </bodi>
+</html""")
 
 
 def main():
@@ -155,8 +204,6 @@ def main():
         acte.bicing_slots = [x[1] for x in acte.ddstance]
         acte.bicing_slots = acte.bicing_slots[:5]
 
-    print(actes[0].bicing_slots)
-
     qnt = 0
     for acte in actes:
         acte.ddstance = []
@@ -166,5 +213,7 @@ def main():
         acte.bicing_bks = [x[1] for x in acte.ddstance]
         acte.bicing_bks = acte.bicing_bks[:5]
 
+    print(len(actes[0].bicing_slots), len(actes[0].bicing_bks))
+    funcio_html(actes)
 
 main()
