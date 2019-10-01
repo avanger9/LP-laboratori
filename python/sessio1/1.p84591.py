@@ -7,6 +7,15 @@ def fact(x):
 	else:
 		return x * fact(x-1)
 
+def factRF(x):
+	'''Funció que calcula x! utilitzant recursivitat final
+           Si Python la optimitzés el cost en espai d'aquest codi equivaldria al de la versió recursiva (Θ(1) enlloc de Θ(n))
+	'''
+	def factRF(x,acumulat=1):
+		if x==0: return acumulat
+		return factRF(x-1,acumulat*x)
+	return factRF(x,1)
+
 def absValue(x):
 	if x < 0:
 		x = -x
@@ -55,4 +64,3 @@ def main():
 
 main()
 """
-
